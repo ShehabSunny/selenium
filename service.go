@@ -12,6 +12,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 )
 
@@ -201,7 +202,8 @@ func NewGeckoDriverService(path string, port int, opts ...ServiceOption) (*Servi
 
 // NewIeDriverService starts a IeDriver instance in the background.
 func NewIeDriverService(path string, port int, opts ...ServiceOption) (*Service, error) {
-	cmd := exec.Command(path, "--port="+strconv.Itoa(port))
+	cmd := exec.Command(path, fmt.Sprintf("--port=%d", port), "--silent")
+	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 	s, err := newService(cmd, "", port, opts...)
 	if err != nil {
 		return nil, err
